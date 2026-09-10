@@ -35,8 +35,7 @@ pipeline {
 
         stage('k8s check') {
             steps {
-                bat 'kubectl version --client'
-                bat 'kubectl get nodes'
+                bat 'kubectl --kubeconfig "c:\\Users\shrut\\.kube\\config" get nodes'
             }
         }
 
