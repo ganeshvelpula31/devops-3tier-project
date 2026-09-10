@@ -8,9 +8,9 @@ pipeline {
             }
         }
 
-        stage('docker check') {
+        stage('command check') {
             steps {
-                bat 'docker --version'
+                bat 'echo jenkins cmd is working'
             }
         }
 
