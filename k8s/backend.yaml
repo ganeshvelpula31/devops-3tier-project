@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: devops-3tier
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: devops-backend:1.0
+          imagePullPolicy: Never
+
+          resources:
+           requests:
+            cpu: "100m"
+            memory: "128Mi"
+           limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+          ports:
+            - containerPort: 5000
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+
+          env:
+           - name: DB_HOST
+             value: database
+
+           - name: POSTGRES_DB
+             valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: POSTGRES_DB
+
+           - name: POSTGRES_USER
+             valueFrom:
+              configMapKeyRef:
+               name: app-config
+               key: POSTGRES_USER
+
+           - name: POSTGRES_PASSWORD
+             valueFrom:
+              secretKeyRef:
+               name: db-secret
+               key: POSTGRES_PASSWORD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: devops-3tier
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 5000
+      targetPort: 5000
