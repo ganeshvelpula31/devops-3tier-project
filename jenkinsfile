@@ -9,9 +9,9 @@ pipeline {
             }
         }
 
-        stage('Docker Check') {
+        stage('Kubernetes Check') {
             steps {
-                bat 'docker --version'
+                bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" get nodes'
             }
         }
 
@@ -33,21 +33,26 @@ pipeline {
             }
         }
 
-        stage('k8s check') {
+        stage('Verify Images') {
             steps {
-                bat 'kubectl --kubeconfig "c:\\Users\\shrut\\.kube\\config" get nodes'
+                bat 'docker images'
             }
         }
 
-        stage('Test') {
+        stage('Deploy to Kubernetes') {
             steps {
-                echo 'Application build completed successfully'
+                bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" apply -f k8s\\namespace.yaml'
+                bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" apply -f k8s\\database-pvc.yaml'
+                bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" apply -f k8s\\database.yaml'
+                bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" apply -f k8s\\backend.yaml'
+                bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" apply -f k8s\\frontend.yaml'
             }
         }
 
-        stage('Deploy') {
+        stage('Verify Deployment') {
             steps {
-                echo 'Deployment stage will be configured next'
+                bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" get pods -n devops-3tier'
+                bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" get services -n devops-3tier'
             }
         }
     }
