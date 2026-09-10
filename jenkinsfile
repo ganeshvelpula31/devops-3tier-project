@@ -33,9 +33,10 @@ pipeline {
             }
         }
 
-        stage('Verify Images') {
+        stage('k8s check') {
             steps {
-                bat 'docker images'
+                bat 'kubectl version --client'
+                bat 'kubectl get nodes'
             }
         }
 
