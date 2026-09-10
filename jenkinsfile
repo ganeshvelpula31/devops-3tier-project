@@ -2,29 +2,52 @@ pipeline {
     agent any
 
     stages {
+
         stage('Checkout') {
             steps {
-                echo 'Checking out source code...'
+                echo 'Source code checked out from GitHub'
             }
         }
 
-        stage('Build Backend Docker Image') {
+        stage('Docker Check') {
             steps {
-               bat 'docker build -t devops-backend:1.0 ./backend'
+                bat 'docker --version'
             }
         }
+
+        stage('Build Backend Image') {
+            steps {
+                bat 'docker build -t devops-backend:1.0 ./backend'
             }
-    }
+        }
+
+        stage('Build Frontend Image') {
+            steps {
+                bat 'docker build -t devops-frontend:1.0 ./frontend'
+            }
+        }
+
+        stage('Build Database Image') {
+            steps {
+                bat 'docker build -t devops-database:1.0 ./database'
+            }
+        }
+
+        stage('Verify Images') {
+            steps {
+                bat 'docker images'
+            }
+        }
 
         stage('Test') {
             steps {
-                echo 'Test stage started...'
+                echo 'Application build completed successfully'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deploy stage started...'
+                echo 'Deployment stage will be configured next'
             }
         }
     }
