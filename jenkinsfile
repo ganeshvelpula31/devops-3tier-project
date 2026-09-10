@@ -8,9 +8,9 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('docker check') {
             steps {
-                echo 'Build stage started...'
+                bat 'docker --version'
             }
         }
 
