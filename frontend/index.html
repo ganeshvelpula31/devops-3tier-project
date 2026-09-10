@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps 3-Tier Application</title>
+</head>
+
+<body>
+
+    <h1>DevOps 3-Tier Application</h1>
+
+    <h2>Create Task</h2>
+
+    <input id="title" type="text" placeholder="Task title">
+    <input id="description" type="text" placeholder="Description">
+    <button onclick="createTask()">Create Task</button>
+
+    <h2>Tasks</h2>
+
+    <button onclick="loadTasks()">Load Tasks</button>
+
+    <div id="tasks"></div>
+
+    <script>
+
+        async function loadTasks() {
+            try {
+                const response = await fetch("/api/tasks");
+                const tasks = await response.json();
+
+                const container = document.getElementById("tasks");
+
+                if (tasks.length === 0) {
+                    container.innerHTML = "<p>No tasks found.</p>";
+                    return;
+                }
+
+                container.innerHTML = tasks.map(task => `
+                    <div>
+                        <h3>${task.title}</h3>
+                        <p>${task.description}</p>
+                        <p>Completed: ${task.completed}</p>
+
+                        <button onclick="updateTask(${task.id})">
+                            Mark Complete
+                        </button>
+
+                        <button onclick="deleteTask(${task.id})">
+                            Delete
+                        </button>
+
+                        <hr>
+                    </div>
+                `).join("");
+
+            } catch (error) {
+                document.getElementById("tasks").textContent =
+                    "Failed to load tasks";
+            }
+        }
+
+
+        async function createTask() {
+
+            const title = document.getElementById("title").value;
+            const description =
+                document.getElementById("description").value;
+
+            if (!title) {
+                alert("Please enter a task title");
+                return;
+            }
+
+            await fetch("/api/tasks", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: description
+                })
+            });
+
+            document.getElementById("title").value = "";
+            document.getElementById("description").value = "";
+
+            loadTasks();
+        }
+
+
+        async function updateTask(id) {
+
+            const response = await fetch("/api/tasks");
+
+            const tasks = await response.json();
+
+            const task = tasks.find(t => t.id === id);
+
+            await fetch(`/api/tasks/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    title: task.title,
+                    description: task.description,
+                    completed: true
+                })
+            });
+
+            loadTasks();
+        }
+
+
+        async function deleteTask(id) {
+
+            await fetch(`/api/tasks/${id}`, {
+                method: "DELETE"
+            });
+
+            loadTasks();
+        }
+
+    </script>
+
+</body>
+</html>
