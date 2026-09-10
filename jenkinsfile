@@ -51,6 +51,8 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
+                bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" rollout status deployment/backend -n devops-3tier'
+                bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" rollout status deployment/frontend -n devops-3tier'
                 bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" get pods -n devops-3tier'
                 bat 'kubectl --kubeconfig "C:\\Users\\shrut\\.kube\\config" get services -n devops-3tier'
             }
